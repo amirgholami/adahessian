@@ -58,7 +58,7 @@ parser.add_argument('--weight-decay', '--wd', default=5e-4, type=float,
                     metavar='W', help='weight decay (default: 5e-4)')
 parser.add_argument('--depth', type=int, default=20,
                     help='choose the depth of resnet')
-parser.add_argument('--optimizer', type=str, default='adahess',
+parser.add_argument('--optimizer', type=str, default='adahessian',
                     help='choose optim')
 
 args = parser.parse_args()
@@ -101,7 +101,7 @@ elif args.optimizer == 'adamw':
         model.parameters(),
         lr=args.lr,
         weight_decay=args.weight_decay)
-elif args.optimizer == 'adahess':
+elif args.optimizer == 'adahessian':
     print('For Adahess, we use the decoupled weight decay as AdamW. Here we automatically correct this for you! If this is not what you want, please modify the code!')
     args.weight_decay = args.weight_decay / args.lr
     optimizer = Adahess(
@@ -140,7 +140,7 @@ for epoch in range(1, args.epochs + 1):
             correct += predicted.eq(target).sum().item()
             if args.optimizer in ['adamw', 'adam', 'sgd']:
                 optimizer.step()
-            elif args.optimizer in ['adahess']:
+            elif args.optimizer in ['adahessian']:
                 _, gradsH = get_params_grad(model)
                 optimizer.step(gradsH)
             else:
@@ -156,7 +156,11 @@ for epoch in range(1, args.epochs + 1):
 
     if acc > best_acc:
         best_acc = acc
-        torch.save(model.state_dict(), 'checkpoint/netbest.pkl')
-
+        torch.save({
+            'epoch': epoch,
+            'model': model.state_dict(),
+            'optimizer': optimizer.state_dict(),
+            'best_accuracy': best_acc,
+            }, 'checkpoint/netbest.pkl')
 
 print(f'Best Acc: {np.around(best_acc * 100, 2)}')
