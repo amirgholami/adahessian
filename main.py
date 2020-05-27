@@ -28,6 +28,7 @@ import argparse
 from tqdm import tqdm, trange
 
 import torch
+import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -74,6 +75,9 @@ if not os.path.isdir('checkpoint/'):
 # get dataset
 train_loader, test_loader = getData(
     name='cifar10', train_bs=args.batch_size, test_bs=args.test_batch_size)
+
+# make sure to use cudnn.benchmark for second backprop
+cudnn.benchmark = True
 
 # get model and optimizer
 model = resnet(num_classes=10, depth=args.depth).cuda()
