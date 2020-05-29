@@ -54,6 +54,12 @@ AdaHessian:
 --optimizer adahessian
 ```
 
+We also provide the scripts in config for reproducation:
+```
+bash config/resnet20_cifar10/{sgd, adam, adamw, adahessian}.sh
+
+bash config/resnet32_cifar10/{sgd, adam, adamw, adahessian}.sh
+```
 ## Citation
 AdaHessian has been developed as part of the following paper. We appreciate it if you would please cite the following paper if you found the library useful for your work:
 

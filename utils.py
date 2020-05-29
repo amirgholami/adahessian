@@ -2,14 +2,14 @@
 # @file Different utility functions
 # Copyright (c) Zhewei Yao, Amir Gholami, Sheng Shen
 # All rights reserved.
-# This file is part of adahessian library.
+# This file is part of AdaHessian library.
 #
-# PyHessian is free software: you can redistribute it and/or modify
+# AdaHessian is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# PyHessian is distributed in the hope that it will be useful,
+# AdaHessian is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -142,7 +142,7 @@ def getData(
 
 
 def test(model, test_loader):
-    print('Testing')
+    # print('Testing')
     model.eval()
     correct = 0
     total_num = 0
@@ -154,7 +154,7 @@ def test(model, test_loader):
             pred = output.data.max(1, keepdim=True)[1]
             correct += pred.eq(target.data.view_as(pred)).cpu().sum().item()
             total_num += len(data)
-    print('testing_correct: ', correct / total_num, '\n')
+    # print('testing_correct: ', correct / total_num, '\n')
     return correct / total_num
 
 

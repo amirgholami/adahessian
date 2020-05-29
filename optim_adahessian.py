@@ -2,14 +2,14 @@
 # @file Different utility functions
 # Copyright (c) Zhewei Yao, Amir Gholami, Sheng Shen
 # All rights reserved.
-# This file is part of adahessian library.
+# This file is part of AdaHessian library.
 #
-# PyHessian is free software: you can redistribute it and/or modify
+# AdaHessian is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# PyHessian is distributed in the hope that it will be useful,
+# AdaHessian is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -25,7 +25,7 @@ from copy import deepcopy
 import numpy as np
 
 
-class Adahess(Optimizer):
+class Adahessian(Optimizer):
     """Implements Adahessian algorithm.
     It has been proposed in `ADAHESSIAN: An Adaptive Second OrderOptimizer for Machine Learning`.
     Arguments:
@@ -56,7 +56,7 @@ class Adahess(Optimizer):
         defaults = dict(lr=lr, betas=betas, eps=eps,
                         weight_decay=weight_decay)
 
-        super(Adahess, self).__init__(params, defaults)
+        super(Adahessian, self).__init__(params, defaults)
 
     def get_trace(self, gradsH):
         """

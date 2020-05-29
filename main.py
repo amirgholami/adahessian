@@ -2,14 +2,14 @@
 # @file Different utility functions
 # Copyright (c) Zhewei Yao, Amir Gholami, Sheng Shen
 # All rights reserved.
-# This file is part of adahessian library.
+# This file is part of AdaHessian library.
 #
-# PyHessian is free software: you can redistribute it and/or modify
+# AdaHessian is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# PyHessian is distributed in the hope that it will be useful,
+# AdaHessian is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -38,7 +38,7 @@ from torch.autograd import Variable
 
 from utils import *
 from models.resnet import *
-from optim_adahess import Adahess
+from optim_adahessian import Adahessian
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Example')
 parser.add_argument('--batch-size', type=int, default=256, metavar='B',
@@ -106,9 +106,9 @@ elif args.optimizer == 'adamw':
         lr=args.lr,
         weight_decay=args.weight_decay)
 elif args.optimizer == 'adahessian':
-    print('For Adahess, we use the decoupled weight decay as AdamW. Here we automatically correct this for you! If this is not what you want, please modify the code!')
+    print('For AdaHessian, we use the decoupled weight decay as AdamW. Here we automatically correct this for you! If this is not what you want, please modify the code!')
     args.weight_decay = args.weight_decay / args.lr
-    optimizer = Adahess(
+    optimizer = Adahessian(
         model.parameters(),
         lr=args.lr,
         weight_decay=args.weight_decay)
@@ -156,7 +156,7 @@ for epoch in range(1, args.epochs + 1):
     acc = test(model, test_loader)
     train_loss /= total_num
     print(f"Training Loss of Epoch {epoch}: {np.around(train_loss, 2)}")
-    print(f"Testing of Epoch {epoch}: {np.around(acc * 100, 2)}")
+    print(f"Testing of Epoch {epoch}: {np.around(acc * 100, 2)} \n")
 
     if acc > best_acc:
         best_acc = acc
