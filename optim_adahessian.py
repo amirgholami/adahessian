@@ -37,10 +37,11 @@ class Adahessian(Optimizer):
         eps (float, optional): term added to the denominator to improve
             numerical stability (default: 1e-4)
         weight_decay (float, optional): weight decay (L2 penalty) (default: 0)
+        hessian_power (float, optional): Hessian power (default: 1)
     """
 
     def __init__(self, params, lr=0.15, betas=(0.9, 0.999), eps=1e-4,
-                 weight_decay=0):
+                 weight_decay=0, hessian_power=1):
         if not 0.0 <= lr:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if not 0.0 <= eps:
@@ -53,22 +54,22 @@ class Adahessian(Optimizer):
             raise ValueError(
                 "Invalid beta parameter at index 1: {}".format(
                     betas[1]))
+        if not 0.0 <= hessian_power <= 1.0:
+            raise ValueError("Invalid Hessian power value: {}".format(hessian_power))
         defaults = dict(lr=lr, betas=betas, eps=eps,
-                        weight_decay=weight_decay)
+                        weight_decay=weight_decay, hessian_power=hessian_power)
 
         super(Adahessian, self).__init__(params, defaults)
 
     def get_trace(self, gradsH):
         """
-        compute the Hessian vector product with v, at the current gradient point,
+        compute the Hessian vector product with a random vector v, at the current gradient point,
         i.e., compute the gradient of <gradsH,v>.
-        :param v: a list of torch tensors
         :param gradsH: a list of torch variables
         :return: a list of torch tensors
         """
 
         params = self.param_groups[0]['params']
-        output = [0. for p in params]
 
         v = [torch.randint_like(p, high=2, device='cuda') for p in params]
         for v_i in v:
@@ -85,13 +86,13 @@ class Adahessian(Optimizer):
             param_size = hv.size()
             if len(param_size) <= 2:  # for 0/1/2D tensor
                 tmp_output = torch.abs(hv * vi)
-                hutchinson_trace.append(tmp_output)
+                hutchinson_trace.append(tmp_output) # Hessian diagonal block size is 1 here.
             elif len(param_size) == 4:  # Conv kernel
                 tmp_output = torch.abs(torch.sum(torch.abs(
-                    hv * vi), dim=[2, 3], keepdim=True)) / vi[0, 1].numel()
+                    hv * vi), dim=[2, 3], keepdim=True)) / vi[0, 1].numel() # Hessian diagonal block size is 9 here: torch.sum() reduces the dim 2/3.
                 hutchinson_trace.append(tmp_output)
-        output = [a + b for a, b in zip(output, hutchinson_trace)]
-        return output
+        
+        return hutchinson_trace
 
     def step(self, gradsH, closure=None):
         """Performs a single optimization step.
@@ -103,9 +104,8 @@ class Adahessian(Optimizer):
         loss = None
         if closure is not None:
             loss = closure()
-        # here is the delay step time, if we do not need to compute the trace,
-        # we will use the one in the previous step.
 
+        # get the Hessian diagonal
         hut_trace = self.get_trace(gradsH)
 
         for group in self.param_groups:
@@ -121,10 +121,10 @@ class Adahessian(Optimizer):
                     state['step'] = 0
                     # Exponential moving average of gradient values
                     state['exp_avg'] = torch.zeros_like(p.data)
-                    # Exponential moving average of squared gradient values
-                    state['exp_avg_sq'] = torch.zeros_like(p.data)
+                    # Exponential moving average of Hessian diagonal square values
+                    state['exp_hessian_diag_sq'] = torch.zeros_like(p.data)
 
-                exp_avg, exp_avg_sq = state['exp_avg'], state['exp_avg_sq']
+                exp_avg, exp_hessian_diag_sq = state['exp_avg'], state['exp_hessian_diag_sq']
 
                 beta1, beta2 = group['betas']
 
@@ -132,18 +132,20 @@ class Adahessian(Optimizer):
 
                 # Decay the first and second moment running average coefficient
                 exp_avg.mul_(beta1).add_(1 - beta1, grad)
-                exp_avg_sq.mul_(beta2).addcmul_(
+                exp_hessian_diag_sq.mul_(beta2).addcmul_(
                     1 - beta2, hut_trace[i], hut_trace[i])
 
                 bias_correction1 = 1 - beta1 ** state['step']
                 bias_correction2 = 1 - beta2 ** state['step']
 
-                # correct the eps adding term
+                # make the square root, and the Hessian power
+                k = group['hessian_power']
                 denom = (
-                    (exp_avg_sq.sqrt()) /
-                    math.sqrt(bias_correction2)).add_(
+                    (exp_hessian_diag_sq.sqrt() ** k) /
+                    math.sqrt(bias_correction2) ** k).add_(
                     group['eps'])
 
+                # make update
                 p.data = p.data - \
                     group['lr'] * (exp_avg / bias_correction1 / denom + group['weight_decay'] * p.data)
 
