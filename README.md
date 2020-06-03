@@ -3,6 +3,8 @@
 
 AdaHessian is a second order based optimizer for the neural network training based on PyTorch. The library supports the training of convolutional neural networks for now and will support transformer-based models soon. 
 
+Please see [this paper](https://arxiv.org/pdf/2006.00719.pdf) for details of the algorithm.
+
 
 ## Usage
 Please first clone the AdaHessian library to your local system:
@@ -56,7 +58,7 @@ AdaHessian:
 --optimizer adahessian
 ```
 
-We also provide the scripts in config for reproducation:
+You can also run the following scripts to reproduce the results reported in Table 2 of the [paper](https://arxiv.org/pdf/2006.00719.pdf):
 ```
 bash config/resnet20_cifar10/{sgd, adam, adamw, adahessian}.sh
 
@@ -65,6 +67,6 @@ bash config/resnet32_cifar10/{sgd, adam, adamw, adahessian}.sh
 ## Citation
 AdaHessian has been developed as part of the following paper. We appreciate it if you would please cite the following paper if you found the library useful for your work:
 
-* Z. Yao, A. Gholami, S. Shen, K Keutzer, M. Mahoney. ADAHESSIAN: An Adaptive Second OrderOptimizer for Machine Learning, under review.
+* Z. Yao, A. Gholami, S. Shen, K Keutzer, M. Mahoney. ADAHESSIAN: An Adaptive Second Order Optimizer for Machine Learning, under review.
 
 
