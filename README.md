@@ -1,4 +1,6 @@
 ## Introduction
+![Block](imgs/diagonal_illustration.png)
+
 AdaHessian is a second order based optimizer for the neural network training based on PyTorch. The library supports the training of convolutional neural networks for now and will support transformer-based models soon. 
 
 
