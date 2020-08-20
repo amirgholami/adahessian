@@ -15,10 +15,10 @@ git clone https://github.com/amirgholami/adahessian.git
 After cloning, please enter either image_classification or transformer folder for further information.
 
 ## For different kernel size (e.g, matrix, Conv1D, Conv2D, etc)
-We found out it would be helpful to add an instruction about how to adopt AdaHessian for your own models and problems. Hence, we add a prototype version of AdaHessian as well as some useful comments in the intruction folder. 
+We found out it would be helpful to add instruction about how to adopt AdaHessian for your own models and problems. Hence, we add a prototype version of AdaHessian as well as some useful comments in the instruction folder. 
 
 ## External implementations and discussions
-We thanks a lot for all the individuals and groups to implement their own AdaHessian versions and discussed AdaHessian in the media. We include those links here for people who are interested in this. 
+We thank a lot for all the individuals and groups who have implemented their own AdaHessian versions and discussed AdaHessian. We include the following links in case you are interested to learn more about AdaHessian.
 
 Description | Link | New Features
 ---|---|---
