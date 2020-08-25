@@ -26,7 +26,7 @@ Reddit Discussion | [Link](https://www.reddit.com/r/MachineLearning/comments/i76
 Fast.ai Discussion | [Link](https://forums.fast.ai/t/adahessian/76214/15) | -- 
 Best-Deep-Learning-Optimizers Code| [Link](https://github.com/lessw2020/Best-Deep-Learning-Optimizers/tree/master/adahessian) | --
 ada-hessian Code | [Link](https://github.com/davda54/ada-hessian) | Support Delayed Hessian Update
-AdaHessian Analysis | https://github.com/githubharald/analyze_ada_hessian | Analyze AdaHessian on a 2D example
+AdaHessian Analysis | [Link](https://github.com/githubharald/analyze_ada_hessian) | Analyze AdaHessian on a 2D example
 
 ## Citation
 AdaHessian has been developed as part of the following paper. We appreciate it if you would please cite the following paper if you found the library useful for your work:
