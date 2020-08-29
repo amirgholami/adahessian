@@ -5,6 +5,11 @@ AdaHessian is a second order based optimizer for the neural network training bas
 
 Please see [this paper](https://arxiv.org/pdf/2006.00719.pdf) for more details on the AdaHessian algorithm.
 
+For more details please see:
+
+- [Video explanation of AdaHessian](https://www.youtube.com/watch?v=S87ancnZ0MM)
+- [AdaHessian paper](https://arxiv.org/pdf/2006.00719.pdf).
+
 
 ## Usage
 Please first clone the AdaHessian library to your local system:
@@ -18,7 +23,7 @@ After cloning, please enter either image_classification or transformer folder fo
 We found out it would be helpful to add instruction about how to adopt AdaHessian for your own models and problems. Hence, we add a prototype version of AdaHessian as well as some useful comments in the instruction folder. 
 
 ## External implementations and discussions
-We thank a lot for all the individuals and groups who have implemented their own AdaHessian versions and discussed AdaHessian. We include the following links in case you are interested to learn more about AdaHessian.
+We are thankful to all the researchers who have extended AdaHessian for different purposes or analyzed it. We include the following links in case you are interested to learn more about AdaHessian.
 
 Description | Link | New Features
 ---|---|---
