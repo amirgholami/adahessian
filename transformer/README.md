@@ -5,7 +5,7 @@ We also provide [pre-trained models](#pre-trained-models) on IWSLT'14 German to 
 # Requirements and Installation
 Please first install Pytorch and other dependencies:
 ```
-conda env create --f environment.yml
+conda env create -f environment.yml
 ```
 Afterwards, install Fairseq:
 ```
