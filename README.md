@@ -31,6 +31,7 @@ Reddit Discussion | [Link](https://www.reddit.com/r/MachineLearning/comments/i76
 Fast.ai Discussion | [Link](https://forums.fast.ai/t/adahessian/76214/15) | -- 
 Best-Deep-Learning-Optimizers Code| [Link](https://github.com/lessw2020/Best-Deep-Learning-Optimizers/tree/master/adahessian) | --
 ada-hessian Code | [Link](https://github.com/davda54/ada-hessian) | Support Delayed Hessian Update
+JAX Code | [link](https://github.com/nestordemeure/AdaHessianJax) | --
 AdaHessian Analysis | [Link](https://github.com/githubharald/analyze_ada_hessian) | Analyze AdaHessian on a 2D example
 
 ## Citation
