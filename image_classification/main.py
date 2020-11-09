@@ -39,6 +39,7 @@ from torch.autograd import Variable
 from utils import *
 from models.resnet import *
 from optim_adahessian import Adahessian
+
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Example')
 parser.add_argument('--batch-size', type=int, default=256, metavar='B',
@@ -142,14 +143,7 @@ for epoch in range(1, args.epochs + 1):
             total_num += target.size()[0]
             _, predicted = output.max(1)
             correct += predicted.eq(target).sum().item()
-            if args.optimizer in ['adamw', 'adam', 'sgd']:
-                optimizer.step()
-            elif args.optimizer in ['adahessian']:
-                _, gradsH = get_params_grad(model)
-                optimizer.step(gradsH)
-            else:
-                raise Exception('We do not support this optimizer yet!!')
-
+            optimizer.step()
             optimizer.zero_grad()
             progressbar.update(target.size(0))
 
