@@ -38,10 +38,17 @@ class Adahessian(Optimizer):
             numerical stability (default: 1e-4)
         weight_decay (float, optional): weight decay (L2 penalty) (default: 0)
         hessian_power (float, optional): Hessian power (default: 1)
+        spatial_average_block_size (int, optional): Spatial average block size for 1d tensors (default: (-1, -1, -1, -1) ). 
+        Here for now, we only write down the tensor size from 1D to 4D. For higher dimension tensors (e.g., 5D), you can incorporate 
+        the code by yourself. 
+            -1 for 1D: no spatial average 
+            -1 for 2D: use the entire row as the spatial average
+            -1 for 3D (we assume it is a 1D Conv, you can customize it): use the channel (last dimension) of 1D Conv as spatial average
+            -1 for 4D (we assume it is a 2D Conv, you can customize it): use the channel (last two dimension) of 2D Conv as spatial average
     """
 
     def __init__(self, params, lr=0.15, betas=(0.9, 0.999), eps=1e-4,
-                 weight_decay=0, block_length=1, hessian_power=1):
+                 weight_decay=0, hessian_power=1, spatial_average_block_size=(-1, -1, -1, -1)):
         if not 0.0 <= lr:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if not 0.0 <= eps:
@@ -61,9 +68,9 @@ class Adahessian(Optimizer):
 
         super(Adahessian, self).__init__(params, defaults)
 
-        self.block_length = block_length
+        self.spatial_average_block_size = spatial_average_block_size
 
-    def get_trace(self, gradsH):
+    def get_trace(self, params, grads):
         """
         compute the Hessian vector product with a random vector v, at the current gradient point,
         i.e., compute the gradient of <gradsH,v>.
@@ -71,81 +78,86 @@ class Adahessian(Optimizer):
         :return: a list of torch tensors
         """
 
-        params = self.param_groups[0]['params']
+        # Check backward was called with create_graph set to True
+        for i, grad in enumerate(grads):
+            if grad.grad_fn is None:
+                raise RuntimeError('Gradient tensor {:} does not have grad_fn. When calling\n'.format(i) +
+                           '\t\t\t  loss.backward(), make sure the option create_graph is\n' +
+                           '\t\t\t  set to True.')
 
-        v = [torch.randint_like(p, high=2, device='cuda') for p in params]
-        for v_i in v:
-            v_i[v_i == 0] = -1
+        v = [ 2 * torch.randint_like(p, high=2, device='cuda') - 1 for p in params]
+
         hvs = torch.autograd.grad(
-            gradsH,
+            grads,
             params,
             grad_outputs=v,
             only_inputs=True,
             retain_graph=True)
 
+        bs_1D, bs_2D, bs_3D, bs_4D = self.spatial_average_block_size
+
         hutchinson_trace = []
-        for hv, vi in zip(hvs, v):
+        for hv in hvs:
             param_size = hv.size()
+
+            hv_abs = hv.abs()
+
             if len(param_size) <= 1:  
                 # For 1D tensor, e.g.,, bias, BatchNorm, LayerNorm etc.
                 # Usually, you do not need to set spatial aveging for it, i.e., Hessian diagonal block size is 1 here.
-                tmp_output = torch.abs(hv * vi)
-                hutchinson_trace.append(tmp_output)
-
-                # Of course, you can also use the same way as 2D tensor does to average your 1D tensor. 
-                # tmp_output1 = torch.abs((hv * vi + 0.)).view(-1, self.block_length) # faltten to the N times self.block_length
-                # tmp_output2 = torch.abs(torch.sum(tmp_output1, dim=[1])).view(-1) / float(self.block_length)
-                # tmp_output3 = tmp_output2.repeat_interleave(self.block_length).view(param_size)
-                # hutchinson_trace.append(tmp_output3)
+                
+                if bs_1D == -1:
+                    hutchinson_trace.append(hv_abs)
+                else:
+                    tmp_output1 = hv_abs.view(-1, bs_1D) # faltten to the N times bs_1D
+                    tmp_output2 = torch.mean(tmp_output1, dim=[1])
+                    tmp_output3 = tmp_output2.repeat_interleave(bs_1D).view(param_size)
+                    hutchinson_trace.append(tmp_output3)
 
             elif len(param_size) == 2: 
                 # For 2D tensor, e.g., the matrix in the fully-connected layer.
                 # This is a normal case for MLP, Transformer models. 
                 # Usually, a spatial averaging needs to be used here to get the best result.
-                # If you are not looking for the absolute best config, you may set it to be 1.
-                # In all of our experiments, we sill get pretty good performance.
-                tmp_output1 = torch.abs((hv * vi + 0.)).view(-1, self.block_length) # faltten to the N times self.block_length
-                tmp_output2 = torch.abs(torch.sum(tmp_output1, dim=[1])).view(-1) / float(self.block_length)
-                tmp_output3 = tmp_output2.repeat_interleave(self.block_length).view(param_size)
-                hutchinson_trace.append(tmp_output3)
+
+                if bs_2D == -1:
+                    hutchinson_trace.append( torch.mean(hv_abs, dim=[1], keepdim=True) )
+                else:
+                    tmp_output1 = hv_abs.view(-1, bs_2D) # faltten to the N times bs_2D
+                    tmp_output2 = torch.mean(tmp_output1, dim=[1])
+                    tmp_output3 = tmp_output2.repeat_interleave(bs_2D).view(param_size)
+                    hutchinson_trace.append(tmp_output3)
+
             elif len(param_size) == 3:
                 # For 3D tensor, e.g., the 1D Conv layer.
                 # This layer is usually used for Char-LM.
 
-                # First Way:
-                # Usually, you can set it to be the conv kernel size: in more details, for instance, your input/output channels are 20 and your kernel size is 5, 
-                # then the 1D Conv kernel is in size 20x20x5, you can average along the final dim, i.e., the block_length = 5
-                tmp_output = torch.abs(torch.sum(torch.abs(
-                    hv * vi), dim=[2], keepdim=True)) / vi[0, 1].numel() # torch.sum() reduces the dim 2， i.e. the size 5
+                if bs_3D == -1:
+                    hutchinson_trace.append( torch.mean(hv_abs, dim=[2], keepdim=True) )
+                else:
+                    tmp_output1 = hv_abs.view(-1, bs_3D) # faltten to the N times bs_3D
+                    tmp_output2 = torch.mean(tmp_output1, dim=[1])
+                    tmp_output3 = tmp_output2.repeat_interleave(bs_3D).view(param_size)
+                    hutchinson_trace.append(tmp_output3)
 
-                # Second way:
-                # Of course, you can also use the same self.block_length to average the spatival Hessian of 3D kernel.
-                # tmp_output1 = torch.abs((hv * vi + 0.)).view(-1, self.block_length) # faltten to the N times self.block_length
-                # tmp_output2 = torch.abs(torch.sum(tmp_output1, dim=[1])).view(-1) / float(self.block_length)
-                # tmp_output3 = tmp_output2.repeat_interleave(self.block_length).view(param_size)
-                # hutchinson_trace.append(tmp_output3)
 
             elif len(param_size) == 4:  
                 # For 4D tensor, e.g, the 2D Conv layer
                 # This layer is usually used for CV tasks.
 
-                # First Way:
-                # Usually, you can set it to be the conv kernel size: in more details, for instance, your input/output channels are 256 and your kernel size is 3x3, 
-                # then the 2D Conv kernel is in size 20x20x3x3, you can average along the last two dims, , i.e., the block_length = 9
-                tmp_output = torch.abs(torch.sum(torch.abs(
-                    hv * vi), dim=[2, 3], keepdim=True)) / vi[0, 1].numel() # torch.sum() reduces the dim 2/3.
-                hutchinson_trace.append(tmp_output)
+                if bs_4D == -1:
+                    hutchinson_trace.append( torch.mean(hv_abs, dim=[2, 3], keepdim=True) )
+                else:
+                    tmp_output1 = hv_abs.view(-1, bs_4D) # faltten to the N times bs_4D
+                    tmp_output2 = torch.mean(tmp_output1, dim=[1])
+                    tmp_output3 = tmp_output2.repeat_interleave(bs_4D).view(param_size)
+                    hutchinson_trace.append(tmp_output3)
 
-                # Second way:
-                # Of course, you can also use the same self.block_length to average the spatival Hessian of 4D kernel.
-                # tmp_output1 = torch.abs((hv * vi + 0.)).view(-1, self.block_length) # faltten to the N times self.block_length
-                # tmp_output2 = torch.abs(torch.sum(tmp_output1, dim=[1])).view(-1) / float(self.block_length)
-                # tmp_output3 = tmp_output2.repeat_interleave(self.block_length).view(param_size)
-                # hutchinson_trace.append(tmp_output3)
-        
+            else:
+                raise RuntimeError(f'You need to write your customized function to support this shape: {param_size}')
+
         return hutchinson_trace
 
-    def step(self, gradsH, closure=None):
+    def step(self, closure=None):
         """Performs a single optimization step.
         Arguments:
             gradsH: The gradient used to compute Hessian vector product.
@@ -156,8 +168,22 @@ class Adahessian(Optimizer):
         if closure is not None:
             loss = closure()
 
+        params = []
+        groups = []
+        grads = []
+
+        # Flatten groups into lists, so that
+        #  hut_traces can be called with lists of parameters
+        #  and grads 
+        for group in self.param_groups:
+            for p in group['params']:
+                if p.grad is not None:
+                    params.append(p)
+                    groups.append(group)
+                    grads.append(p.grad)
+
         # get the Hessian diagonal
-        hut_trace = self.get_trace(gradsH)
+        hut_traces = self.get_trace(params, grads)
 
         for group in self.param_groups:
             for i, p in enumerate(group['params']):
