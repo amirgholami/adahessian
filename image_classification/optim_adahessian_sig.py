@@ -74,7 +74,7 @@ class Adahessian(Optimizer):
                            '\t\t\t  loss.backward(), make sure the option create_graph is\n' +
                            '\t\t\t  set to True.')
 
-        v = [2*torch.randint_like(p, high=2)-1 for p in params]
+        v = [2 * torch.randint_like(p, high=2) - 1 for p in params]
         hvs = torch.autograd.grad(
             grads,
             params,
