@@ -1,1 +1,0 @@
-export CUDA_VISIBLE_DEVICES=0; python main.py --lr 0.15 --optimizer adahessian_sig --depth 20
