@@ -16,8 +16,23 @@ Please first clone the AdaHessian library to your local system:
 ```
 git clone https://github.com/amirgholami/adahessian.git
 ```
+You can import the optimizer as follows:
 
-After cloning, please enter either image_classification or transformer folder for further information.
+```python
+from optim_adahessian import Adahessian
+...
+model = YourModel()
+optimizer = Adahessian(model.parameters())
+...
+for input, output in data:
+  optimizer.zero_grad()
+  loss = loss_function(output, model(input))
+  loss.backward(create_graph=True)  # You need this line for Hessian backprop
+  optimizer.step()
+...
+```
+
+Please note that the optim_adahessian is in the image_classification folder. We also have adapted the Adahessian implementation to be compatible with fairseq repo, which can be used for NLP tasks. This is the [link](https://github.com/amirgholami/adahessian/blob/master/transformer/fairseq/optim/adahessian.py) to that version, which can be found in transformer folder.
 
 ## For different kernel size (e.g, matrix, Conv1D, Conv2D, etc)
 We found out it would be helpful to add instruction about how to adopt AdaHessian for your own models and problems. Hence, we add a prototype version of AdaHessian as well as some useful comments in the instruction folder. 
