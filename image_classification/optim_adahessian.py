@@ -25,7 +25,7 @@ from torch.optim.optimizer import Optimizer
 
 class Adahessian(Optimizer):
     """Implements Adahessian algorithm.
-    It has been proposed in `ADAHESSIAN: An Adaptive Second OrderOptimizer for Machine Learning`.
+    It has been proposed in `ADAHESSIAN: An Adaptive Second Order Optimizer for Machine Learning`.
     Arguments:
         params (iterable): iterable of parameters to optimize or dicts defining
             parameter groups
@@ -36,10 +36,11 @@ class Adahessian(Optimizer):
             numerical stability (default: 1e-4)
         weight_decay (float, optional): weight decay (L2 penalty) (default: 0)
         hessian_power (float, optional): Hessian power (default: 1)
+        single_gpu (Bool, optional): Do you use distributed training or not "torch.nn.parallel.DistributedDataParallel" (default: True)
     """
 
     def __init__(self, params, lr=0.15, betas=(0.9, 0.999), eps=1e-4,
-                 weight_decay=0, hessian_power=1):
+                 weight_decay=0, hessian_power=1, single_gpu=True):
         if not 0.0 <= lr:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if not 0.0 <= eps:
@@ -56,7 +57,7 @@ class Adahessian(Optimizer):
             raise ValueError("Invalid Hessian power value: {}".format(hessian_power))
         defaults = dict(lr=lr, betas=betas, eps=eps,
                         weight_decay=weight_decay, hessian_power=hessian_power)
-
+        self.single_gpu = single_gpu 
         super(Adahessian, self).__init__(params, defaults)
 
     def get_trace(self, params, grads):
@@ -75,6 +76,16 @@ class Adahessian(Optimizer):
                            '\t\t\t  set to True.')
 
         v = [2 * torch.randint_like(p, high=2) - 1 for p in params]
+
+        # this is for distributed setting
+        if not self.single_gpu:
+            for v1 in v:
+                dist.all_reduce(v1)
+        if not self.single_gpu:
+            for v_i in v:
+                v_i[v_i < 0.] = -1.
+                v_i[v_i >= 0.] = 1.
+
         hvs = torch.autograd.grad(
             grads,
             params,
@@ -96,6 +107,10 @@ class Adahessian(Optimizer):
                 tmp_output = torch.mean(hv.abs(), dim=[2, 3], keepdim=True)
             hutchinson_trace.append(tmp_output)
 
+        # this is for distributed setting
+        if not self.single_gpu:
+            for output1 in hutchinson_trace:
+                dist.all_reduce(output1)
         
         return hutchinson_trace
 

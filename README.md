@@ -1,7 +1,7 @@
 ## Introduction
 ![Block](imgs/diagonal_illustration.png)
 
-AdaHessian is a second order based optimizer for the neural network training based on PyTorch. The library supports the training of convolutional neural networks ([image_classification](https://github.com/amirgholami/adahessian/tree/master/image_classification)) and transformer-based models ([transformer](https://github.com/amirgholami/adahessian/tree/master/transformer)). 
+AdaHessian is a second order based optimizer for the neural network training based on PyTorch. The library supports the training of convolutional neural networks ([image_classification](https://github.com/amirgholami/adahessian/tree/master/image_classification)) and transformer-based models ([transformer](https://github.com/amirgholami/adahessian/tree/master/transformer)). Our TensorFlow implementation is [adahessian_tf](https://github.com/amirgholami/adahessian/tree/master/adahessian_tf).
 
 Please see [this paper](https://arxiv.org/pdf/2006.00719.pdf) for more details on the AdaHessian algorithm.
 
