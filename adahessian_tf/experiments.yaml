@@ -1,0 +1,44 @@
+module: 'Models.Resnets'
+model: 'cifar_resnet20'
+model_parameters:
+    block_type: 'original'
+    shortcut_type: 'B_original'
+    l2_reg: 0.
+train_parameters:
+    logdir: 'logs'
+    run_name: 'adahessian'
+    log_interval: 20
+    val_interval: 200
+    lr_values: [0.15, 0.015, 0.0015]
+    optim_method: 'adahessian'
+    weight_decay: 0.0005
+
+# module: 'Models.Resnets'
+# model: 'cifar_resnet20'
+# model_parameters:
+#     block_type: 'original'
+#     shortcut_type: 'B_original'
+#     l2_reg: 0.0001
+# train_parameters:
+#     logdir: 'logs'
+#     run_name: 'sgd'
+#     log_interval: 20
+#     val_interval: 200
+#     lr_values: [0.1, 0.01, 0.001]
+#     optim_method: 'sgd'
+#     weight_decay: 0.
+
+# module: 'Models.Resnets'
+# model: 'cifar_resnet20'
+# model_parameters:
+#     block_type: 'original'
+#     shortcut_type: 'B_original'
+#     l2_reg: 0.0001
+# train_parameters:
+#     logdir: 'logs'
+#     run_name: 'adam'
+#     log_interval: 20
+#     val_interval: 200
+#     lr_values: [0.001, 0.0001, 0.00001]
+#     optim_method: 'adam'
+#     weight_decay: 0.
