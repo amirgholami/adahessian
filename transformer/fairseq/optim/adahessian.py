@@ -116,15 +116,17 @@ class Adahess(torch.optim.Optimizer):
         params = self.param_groups[0]['params']
         params = list(filter(lambda x: x.requires_grad, params) )
 
-        v = [torch.randint_like(p, high = 2) for p in params]
+        v = [ 2 * torch.randint_like(p, high=2, device='cuda') - 1 for p in params]
 
-        # this is for distributed setting
+        # this is for distributed setting with single node and multi-gpus, 
+        # for multi nodes setting, we have not support it yet.
         if not self.single_gpu:
             for v1 in v:
                 dist.all_reduce(v1)
-        for v_i in v:
-            v_i[v_i < 0.5] = -1
-            v_i[v_i >= 0.5] = 1
+        if not self.single_gpu:
+            for v_i in v:
+                v_i[v_i < 0.] = -1.
+                v_i[v_i >= 0.] = 1.
 
         hvs = torch.autograd.grad(gradsH, params, grad_outputs=v, only_inputs=True,  retain_graph=True)
 
@@ -141,10 +143,11 @@ class Adahess(torch.optim.Optimizer):
                 hutchinson_trace.append(tmp_output3)
         
 
-        # this is for distributed setting
+        # this is for distributed setting with single node and multi-gpus, 
+        # for multi nodes setting, we have not support it yet.
         if not self.single_gpu:
-            for output1 in output:
-                dist.all_reduce(output1)
+            for output1 in hutchinson_trace:
+                dist.all_reduce(output1 / torch.cuda.device_count())
         
         return hutchinson_trace
 

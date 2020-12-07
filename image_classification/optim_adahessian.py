@@ -77,7 +77,8 @@ class Adahessian(Optimizer):
 
         v = [2 * torch.randint_like(p, high=2) - 1 for p in params]
 
-        # this is for distributed setting
+        # this is for distributed setting with single node and multi-gpus, 
+        # for multi nodes setting, we have not support it yet.
         if not self.single_gpu:
             for v1 in v:
                 dist.all_reduce(v1)
@@ -107,10 +108,11 @@ class Adahessian(Optimizer):
                 tmp_output = torch.mean(hv.abs(), dim=[2, 3], keepdim=True)
             hutchinson_trace.append(tmp_output)
 
-        # this is for distributed setting
+        # this is for distributed setting with single node and multi-gpus, 
+        # for multi nodes setting, we have not support it yet.
         if not self.single_gpu:
             for output1 in hutchinson_trace:
-                dist.all_reduce(output1)
+                dist.all_reduce(output1 / torch.cuda.device_count())
         
         return hutchinson_trace
 
