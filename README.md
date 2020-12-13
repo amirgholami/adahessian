@@ -56,7 +56,7 @@ AdaHessian has been developed as part of the following paper. We appreciate it i
 @article{yao2020adahessian,
   title={ADAHESSIAN: An Adaptive Second Order Optimizer for Machine Learning},
   author={Yao, Zhewei and Gholami, Amir and Shen, Sheng and Keutzer, Kurt and Mahoney, Michael W},
-  journal={arXiv preprint arXiv:2006.00719},
-  year={2020}
+  journal={AAAI (Accepted)},
+  year={2021}
 }
 ```
