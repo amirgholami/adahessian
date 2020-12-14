@@ -35,7 +35,7 @@ class Adahessian(Optimizer):
         eps (float, optional): term added to the denominator to improve
             numerical stability (default: 1e-4)
         weight_decay (float, optional): weight decay (L2 penalty) (default: 0)
-        hessian_power (float, optional): Hessian power (default: 1)
+        hessian_power (float, optional): Hessian power (default: 1). You can also try 0.5. For some tasks we found this to result in better performance.
         single_gpu (Bool, optional): Do you use distributed training or not "torch.nn.parallel.DistributedDataParallel" (default: True)
     """
 
