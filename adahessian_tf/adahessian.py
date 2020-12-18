@@ -81,6 +81,7 @@ class AdaHessian(optimizer_v2.OptimizerV2):
                beta_2=0.999,
                epsilon=1e-4,
                weight_decay = 0.,
+               hessian_power=1.0,
                name='AdaHessian',
                average_size_1d=None,
                average_size_2d=None,
@@ -106,6 +107,9 @@ class AdaHessian(optimizer_v2.OptimizerV2):
             weight_decay: We are using AdamW's weight decay scheme. Defaults to 0.
             name: Optional name for the operations created when applying gradients.
             Defaults to "Adam".
+            hessian_power: Hessian power to control the optimizer more similar to first/second 
+            order method (default: 1). You can also try 0.5. For some tasks we found this 
+            to result in better performance.
             **kwargs: keyword arguments. Allowed to be {`clipnorm`, `clipvalue`, `lr`,
             `decay`}. `clipnorm` is clip gradients by norm; `clipvalue` is clip
             gradients by value, `decay` is included for backward compatibility to
@@ -124,6 +128,7 @@ class AdaHessian(optimizer_v2.OptimizerV2):
         self._set_hyper('beta_2', beta_2)
         self.epsilon = epsilon or backend_config.epsilon()
         self.weight_decay = weight_decay
+        self.hessian_power = hessian_power
         self.average_size_1d = average_size_1d
         self.average_size_2d = average_size_2d
         self.average_size_3d = average_size_3d
@@ -379,7 +384,7 @@ class AdaHessian(optimizer_v2.OptimizerV2):
         if self.weight_decay != 0:
             var.assign_sub(coefficients['lr_t'] * self.weight_decay * var)
 
-        denom = math_ops.sqrt(v / bias_correct2) + coefficients['epsilon']
+        denom = np.power(math_ops.sqrt(v / bias_correct2), self.hessian_power) + coefficients['epsilon']
 
         var.assign_sub( coefficients['lr_t'] * m / bias_correct1 / denom  )
 
