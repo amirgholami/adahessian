@@ -38,11 +38,14 @@ Please note that the optim_adahessian is in the image_classification folder. We 
 We found out it would be helpful to add instruction about how to adopt AdaHessian for your own models and problems. Hence, we add a prototype version of AdaHessian as well as some useful comments in the instruction folder. 
 
 ## Performance on Rastrigin and Rosenbrock Fucntions:
-Below is the convergence of AdaHessian on Rastrigin and Rosenbrock functions. Please see [pytorch-optimizer](https://github.com/jettify/pytorch-optimizer) repo for comparison with other optimization algorithms.
+Below is the convergence of AdaHessian on Rastrigin and Rosenbrock functions, and comparison with SGD and ADAM. Please see [pytorch-optimizer](https://github.com/jettify/pytorch-optimizer) repo for comparison with other optimizers.
 
-+-------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rastrigin_Adahessian.png |  .. image:: https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_Adahessian.png  |
-+-------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+
+
+| AdaHessian      | SGD         | ADAM        |
+|-----------------|-------------|-------------| 
+|  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rastrigin_Adahessian.png" width="500"> |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rastrigin_SGD.png" width="500"> |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rastrigin_Adam.png" width="500"> |
+|  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_Adahessian.png" width="500"> |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_SGD.png" width="500"> | <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_Adam.png" width="500"> |
+
 
 ## External implementations and discussions
 We are thankful to all the researchers who have extended AdaHessian for different purposes or analyzed it. We include the following links in case you are interested to learn more about AdaHessian.
