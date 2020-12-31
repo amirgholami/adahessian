@@ -46,6 +46,9 @@ Below is the convergence of AdaHessian on Rastrigin and Rosenbrock functions, an
 |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rastrigin_Adahessian.png" width="500"> |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rastrigin_SGD.png" width="500"> |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rastrigin_Adam.png" width="500"> |
 |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_Adahessian.png" width="500"> |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_SGD.png" width="500"> | <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_Adam.png" width="500"> |
 
+| Rastrigin Function     |  Rosenbrock Function     |
+|------------------------|--------------------------|
+|  <img src="imgs/rastrigin_function.png" width="500"> | <img src="imgs/rosenbrock_function.png" width="500"> | 
 
 ## External implementations and discussions
 We are thankful to all the researchers who have extended AdaHessian for different purposes or analyzed it. We include the following links in case you are interested to learn more about AdaHessian.
