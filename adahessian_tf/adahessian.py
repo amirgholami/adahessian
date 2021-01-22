@@ -338,9 +338,6 @@ class AdaHessian(optimizer_v2.OptimizerV2):
         m = self.get_slot(var, 'm')
         v = self.get_slot(var, 'v')
 
-        alpha = (
-            coefficients['lr_t'] * math_ops.sqrt(1 - coefficients['beta_2_power']) /
-            (1 - coefficients['beta_1_power']))
         m.assign_add((grad - m) * (1 - coefficients['beta_1_t']))
         # this part need to be changed for spatial averaging
 
