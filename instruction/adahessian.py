@@ -207,7 +207,7 @@ class Adahessian(Optimizer):
                 if p.grad is None:
                     continue
 
-                grad = deepcopy(gradsH[i].data)
+                grad = deepcopy(grads[i].data)
                 state = self.state[p]
 
                 # State initialization
