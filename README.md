@@ -53,6 +53,7 @@ We are thankful to all the researchers who have extended AdaHessian for differen
 
 Description | Link | New Features
 ---|---|---
+Pytorcy Library Implementation | https://github.com/jettify/pytorch-optimizer | --
 Reddit Discussion | [Link](https://www.reddit.com/r/MachineLearning/comments/i76wxd/adahessian_an_adaptive_second_orderoptimizer_for/) | --
 Fast.ai Discussion | [Link](https://forums.fast.ai/t/adahessian/76214/15) | -- 
 Best-Deep-Learning-Optimizers Code| [Link](https://github.com/lessw2020/Best-Deep-Learning-Optimizers/tree/master/adahessian) | --
