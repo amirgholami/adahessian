@@ -381,7 +381,9 @@ class AdaHessian(optimizer_v2.OptimizerV2):
         if self.weight_decay != 0:
             var.assign_sub(coefficients['lr_t'] * self.weight_decay * var)
 
-        denom = np.power(math_ops.sqrt(v / bias_correct2), self.hessian_power) + coefficients['epsilon']
+        # denom = np.power(math_ops.sqrt(v / bias_correct2), self.hessian_power) + coefficients['epsilon']
+        denom = tf.math.pow(math_ops.sqrt(v / bias_correct2), self.hessian_power) + coefficients['epsilon']
+
 
         var.assign_sub( coefficients['lr_t'] * m / bias_correct1 / denom  )
 
