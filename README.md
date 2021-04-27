@@ -21,7 +21,7 @@ Below is the convergence of AdaHessian on Rastrigin and Rosenbrock functions, an
 |<img src="imgs/rosenbrock_function.svg" width="500"> |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_Adahessian.png" width="500"> |  <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_SGD.png" width="500"> | <img src="https://raw.githubusercontent.com/jettify/pytorch-optimizer/master/docs/rosenbrock_Adam.png" width="500"> |
 
 
-## Usage
+## Installation -- Git (Recommended)
 Please first clone the AdaHessian library to your local system:
 ```
 git clone https://github.com/amirgholami/adahessian.git
@@ -43,6 +43,30 @@ for input, output in data:
 ```
 
 Please note that the optim_adahessian is in the image_classification folder. We also have adapted the Adahessian implementation to be compatible with fairseq repo, which can be used for NLP tasks. This is the [link](https://github.com/amirgholami/adahessian/blob/master/transformer/fairseq/optim/adahessian.py) to that version, which can be found in transformer folder.
+
+## Installation -- Pip
+If you are interested to install the library through pip, then we recommend doing so through pytorch-optimizer package as follows:
+
+```
+$ pip install torch_optimizer
+
+```
+
+```
+import torch_optimizer as optim
+
+# model = ...
+optimizer = optim.Adahessian(
+    m.parameters(),
+    lr= 1.0,
+    betas= (0.9, 0.999)
+    eps= 1e-4,
+    weight_decay=0.0,
+    hessian_power=1.0,
+)
+      loss_fn(m(input), target).backward(create_graph = True) # create_graph=True is necessary for Hessian calculation
+optimizer.step()
+```
 
 ## For different kernel size (e.g, matrix, Conv1D, Conv2D, etc)
 We found out it would be helpful to add instruction about how to adopt AdaHessian for your own models and problems. Hence, we add a prototype version of AdaHessian as well as some useful comments in the instruction folder. 
