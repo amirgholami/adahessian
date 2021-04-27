@@ -49,7 +49,6 @@ If you are interested to install the library through pip, then we recommend doin
 
 ```
 $ pip install torch_optimizer
-
 ```
 
 ```
