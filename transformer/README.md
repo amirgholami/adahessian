@@ -13,7 +13,7 @@ python setup.py build develop
 ```
 
 # Reproducing Paper Results
-First, please refer to this [page](https://github.com/pytorch/fairseq/tree/master/examples/translation) to prepare the IWSLT'14 German to English translation datasets (or directly download the preprocessed IWSLT dataset from [here](https://drive.google.com/file/d/1fBG7DmbH0luD8EKqjviG5Equgkaxv3vv/view?usp=sharing).
+First, please refer to this [page](https://github.com/pytorch/fairseq/tree/master/examples/translation) to prepare the IWSLT'14 German to English translation datasets (or directly download the preprocessed IWSLT dataset from [here](https://drive.google.com/file/d/1fBG7DmbH0luD8EKqjviG5Equgkaxv3vv/view?usp=sharing)).
 
 You can also run the following scripts to reproduce the results reported in Table 3 of the [paper](https://arxiv.org/pdf/2006.00719.pdf):
 ```
