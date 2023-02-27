@@ -95,3 +95,7 @@ AdaHessian has been developed as part of the following paper. We appreciate it i
   year={2021}
 }
 ```
+
+## Copyright
+
+THIS SOFTWARE AND/OR DATA WAS DEPOSITED IN THE BAIR OPEN RESEARCH COMMONS REPOSITORY ON 02/27/23.
